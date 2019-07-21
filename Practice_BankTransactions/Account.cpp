@@ -7,14 +7,17 @@ Account::Account()
 	strcpy_s(accountName, "name");
 	accountNumber = 0;
 	balance = 0.00;
+	transactionType = '0/';
 	
 }
 
-Account::Account(int accountNumber, char accountName[50], float balance)
+Account::Account(int accountNumber, char accountName[50], float balance, char transactionType)
 {
 	strcpy_s(this->accountName, accountName);
 	this->accountNumber = accountNumber;
 	this->balance = balance;
+	this->transactionType = transactionType;
+
 	
 }
 
@@ -68,7 +71,7 @@ void Account::Withdraw(float withdrawAmount)
 
 void Account::report() const
 {
-	cout << accountNumber << setw(10) << " " << accountName << " " << setw(10) << balance << endl;
+	cout << accountNumber << setw(20) << " " << accountName << " " << setw(15) << balance << endl;
 }
 
 int Account::returnAccountNumber()
@@ -82,3 +85,7 @@ float Account::returnBalance() const
 	return balance;
 }
 
+char  Account::returnTransaction()
+{
+	return transactionType;
+}

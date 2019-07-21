@@ -14,10 +14,11 @@ public:
 	int accountNumber;
 	char accountName[50];
 	float balance;
+	char transactionType = '/0';
 	
 
 	Account();
-	Account(int accountNumber, char accountName[50],float balance);
+	Account(int accountNumber, char accountName[50],float balance, char transactionType);
 	~Account();
 
 	void createAccount();
@@ -28,6 +29,8 @@ public:
 	void report() const;
 	int returnAccountNumber();
 	float returnBalance() const;
+	char returnTransaction();
+	
 	
 };
 

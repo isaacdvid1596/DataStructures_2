@@ -10,6 +10,7 @@ void deleteAccount(int);
 void modifyAccount(int);
 void displayAll();
 void Deposit_Withdraw(int,int);
+void TransactionHistory();
 
 void menu()
 {
@@ -27,7 +28,8 @@ void menu()
 		cout << "5-All Accounts" << endl;
 		cout << "6-Close Account" << endl;
 		cout << "7-Modify Account" << endl;
-		cout << "8-Exit" << endl;
+		cout << "8-Transaction History" << endl;
+		cout << "9-Exit" << endl;
 
 		cin >> option;
 
@@ -39,11 +41,15 @@ void menu()
 
 		case 2:
 			cout << "Enter the Account Number" << endl;
+			cin >> num;
 			Deposit_Withdraw(num, 1);
 			break;
 
 		case 3:
+
+
 			cout << "Enter the Account Number" << endl;
+			cin >> num;
 			Deposit_Withdraw(num, 2);
 			break;
 
@@ -70,6 +76,10 @@ void menu()
 			break;
 
 		case 8:
+			cout << "Transactions History" << endl;
+			break;
+
+		case 9:
 			cout << "Exiting Program" << endl;
 			break;
 
@@ -79,7 +89,7 @@ void menu()
 		}
 
 
-	} while (option != 8);
+	} while (option != 9);
 
 	
 }
@@ -191,7 +201,7 @@ void displayAccount(int number)
 
 	ifile.open("account.dat", ios::binary);
 
-	if (ifile)
+	if (!ifile)
 	{
 		cout << "File could not be open" << endl;
 	}
@@ -333,11 +343,11 @@ void Deposit_Withdraw(int number, int transactionoption)
 
 	bool found = false;
 
-	Account account;
+	Account act;
 
 	fstream file;
 
-	file.open("account.dat", ios::binary | ios::in, ios::out);
+	file.open("account.dat", ios::binary | ios::in | ios::out);
 	if (!file)
 	{
 		cout << "file could not be open" << endl;
@@ -346,15 +356,16 @@ void Deposit_Withdraw(int number, int transactionoption)
 
 	while (!file.eof() && found == false)
 	{
-		file.read(reinterpret_cast<char*>(&account), sizeof(Account));
-		if (account.returnAccountNumber() == number)
+		file.read(reinterpret_cast<char*>(&act), sizeof(Account));
+		if (act.returnAccountNumber() == number)
 		{
-			account.showAccount();
+			act.showAccount();
 			if (transactionoption == 1)
 			{
 				cout << "Enter the amount to be deposited" << endl;
 				cin >> amt;
-				account.Deposit(amt);
+				act.Deposit(amt);
+				act.transactionType = 'D';
 			}
 
 
@@ -362,16 +373,17 @@ void Deposit_Withdraw(int number, int transactionoption)
 			{
 				cout << "Enter amount to withdraw" << endl;
 				cin >> amt;
-				float balance = (account.returnBalance() - amt);
-				if (account.returnBalance() < amt)
+				float balance = (act.returnBalance() - amt);
+				if (act.returnBalance() < amt)
 					cout << "Insufficient Balance" << endl;
 				else
-					account.Withdraw(amt);
+					act.Withdraw(amt);
+				act.transactionType = 'W';
 			}
 
 			int pos = (-1)*static_cast<int>(sizeof(Account));
 			file.seekp(pos, ios::cur);
-			file.write(reinterpret_cast<char*>(&account), sizeof(Account));
+			file.write(reinterpret_cast<char*>(&act), sizeof(Account));
 			cout << "Record Updated" << endl;
 			found = true;
 		}
@@ -380,5 +392,15 @@ void Deposit_Withdraw(int number, int transactionoption)
 	file.close();
 	if (found == false)
 		cout << "Record not Found" << endl;
+
+}
+
+void WriteTransactionHistory()
+{
+
+}
+
+void DisplayTransactionHistory()
+{
 
 }

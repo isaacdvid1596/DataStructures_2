@@ -1,151 +1,306 @@
 #include <iostream>
 #include <fstream>
+#include "Account.h"
 
 using namespace std;
 
+void writeAccount();
+void displayAccount(int);
+void deleteAccount(int);
+void modifyAccount(int);
+void displayAll();
+void Deposit_Withdraw(int,int);
 
-void operationMenu();
-
-
-struct BankAccount
-{
-	char accNumber[10];
-	char custName[25];
-	float accBalance;
-};
 
 int main()
 {
 
-
 	
-	BankAccount cust1;
-	BankAccount cust2;
-	BankAccount cust3;
+	int num,option;
 	
-
-	//need to create an array of customers
-
-	ofstream examplewfile("example.dat", ios::out | ios::binary);
-
-	if (!examplewfile)
+	do
 	{
-		cout << "Cannot open file" << endl;
-		return 1;
-	}
 
-	strcpy_s(cust1.accNumber, "58988");
-	strcpy_s(cust1.custName, "Eren");
-	cust1.accBalance = 988.85;
+		system("cls");
+
+		cout << "---Main Menu---" << endl;
+		cout << "1-Create Account" << endl;
+		cout << "2-Deposit" << endl;
+		cout << "3-Withdraw" << endl;
+		cout << "4-Balance Enquiry" << endl;
+		cout << "5-All Accounts" << endl;
+		cout << "6-Close Account" << endl;
+		cout << "7-Modify Account" << endl;
+		cout << "8-Exit" << endl;
+
+		cin >> option;
+
+		switch (option)
+		{
+		case 1:
+			writeAccount();
+			break;
+
+		case 2:
+			cout << "Enter the Account Number" << endl;
+			Deposit_Withdraw(num, 1);
+			break;
+
+		case 3:
+			cout << "Enter the Account Number" << endl;
+			Deposit_Withdraw(num, 2);
+			break;
+
+		case 4:
+			cout << "Enter Account Number" << endl;
+			cin >> num;
+			displayAccount(num);
+			break;
+
+		case 5:
+			displayAll();
+			break;
+
+		case 6:
+			cout << "Enter Account Number"<<endl;
+			cin >> num;
+			deleteAccount(num);
+			break;
+
+		case 7:
+			cout << "Enter Account Number" << endl;
+			cin >> num;
+			modifyAccount(num);
+			break;
+
+		case 8:
+			cout << "Exiting Program" << endl;
+			break;
+
+		default:
+			cout << "Enter a valid option" << endl;
+			break;
+		}
 
 
-	strcpy_s(cust2.accNumber, "87876");
-	strcpy_s(cust2.custName, "Emanuel");
-	cust2.accBalance = 500.00;
+	} while (option!=8);
 
 
-	strcpy_s(cust3.accNumber, "77787");
-	strcpy_s(cust3.custName, "Leah");
-	cust3.accBalance = 6000.84;
-
-	for (int i = 0; i < 3; i++)
-	{
-		examplewfile.write(reinterpret_cast<char*>(&cust1), sizeof(BankAccount));
-	}
-
-
-	examplewfile.close();
-
-	if (!examplewfile.good())
-	{
-		cout << "Error occurred at writing time" << endl;
-		return 1;
-	}
-
-	ifstream examplerfile("example.dat", ios::in | ios::binary);
-
-	if (!examplerfile)
-	{
-		cout << "Cannot open file " << endl;
-	}
-
-	for (int i = 0; i < 3; i++)
-	{
-		examplerfile.read(reinterpret_cast<char*>(&cust1), sizeof(BankAccount));
-	}
-
-	cout << "file created succesfully" << endl;
-	examplerfile.close();
-
-	if (!examplerfile.good())
-	{
-		cout << "Error occurred at reading time" << endl;
-		return 1;
-	}
-
-	for (int i = 0; i < 3; i++)
-	{
-		cout << "Account Number : " << cust1.accNumber << endl;
-		cout << "Name : " << cust1.custName << endl;
-		cout << "Balance : " << cust1.accBalance << endl;
-	}
-
-
-
-
-
-	//registering account
-
-	/*
-		cout << "Enter account number / name / balance " << endl;
-
-		cin.getline(cust1.accNumber, 5);
-		cin.getline(cust1.custName, 25);
-		cin >> cust1.accBalance;
-
-	
-	
-
-	cout << "printing all info on screen" << endl;
-
-	
-		cout <<"Account Number : "<< cust1.accNumber << endl;
-		cout <<"Name : "<<cust1.custName << endl;
-		cout <<"Balance : "<< cust1.accBalance << endl;
-	*/
-	
-	
 }
 
-/*
-void operationMenu()
+
+void writeAccount()
 {
-	int operation;
+
+	Account ac;
+	ofstream ofile;
+	ofile.open("account.dat", ios::binary | ios::app);
+	ac.createAccount();
+	ofile.write(reinterpret_cast<char*>(&ac), sizeof(Account));
+	ofile.close();
 
 
-	cout << "---MENU---" << endl;
-	cout << "Select Operation Type" << endl;
-	cout << "1-Deposit" << endl;
-	cout << "2-Withdraw" << endl;
-	cout << "3-Exit" << endl;
+}
 
-	cin >> operation;
+void displayAccount(int number)
+{
+	Account account;
 
-	switch (operation)
+	bool accExists= false;
+
+	ifstream ifile;
+
+	ifile.open("account.dat", ios::binary);
+
+	if (ifile)
 	{
-	case 1:
-		cout<<"Enter account number"
-			
-		break;
+		cout << "File could not be open" << endl;
+	}
 
-	case 2:
-		break;
+	else
+	{
 
-	case 3:
-		break;
+		cout << "Balance Details" << endl;
+
+		while (ifile.read(reinterpret_cast<char *> (&account), sizeof(Account)))
+		{
+			if (account.returnAccountNumber() == number)
+			{
+				account.showAccount();
+				accExists = true;
+			}
+		}
+
+		ifile.close();
+
+		if (accExists == false)
+			cout << "Account does not exist" << endl;
 
 
 	}
 
 }
-*/
+
+void deleteAccount(int number)
+{
+	Account account;
+
+	ifstream ifile;
+
+	ofstream ofile;
+
+	ifile.open("account.dat", ios::binary);
+
+	if (!ifile)
+	{
+		cout << "File could not be open" << endl; 
+		return;
+	}
+	ofile.open("temp.dat", ios::binary);
+	ifile.seekg(0, ios::beg);
+	while (ifile.read(reinterpret_cast<char*> (&account), sizeof(Account)))
+	{
+		if (account.returnAccountNumber() != number)
+		{
+			ofile.write(reinterpret_cast<char*> (&account), sizeof(Account));
+		}
+	}
+
+	ifile.close();
+	ofile.close();
+	remove("account.dat");
+	rename("temp.data", "account.dat");
+	cout << "Record Deleted" << endl;
+
+}
+
+void modifyAccount(int number)
+{
+	bool  found = false;
+
+	Account account;
+
+	fstream file;
+
+	file.open("account.dat", ios::binary | ios::in | ios::out);
+
+	if (!file)
+	{
+		cout << "File could not be open" << endl;
+		return;
+	}
+	while (!file.eof() && found == false)
+	{
+		file.read(reinterpret_cast<char*>(&account), sizeof(Account));
+		if (account.returnAccountNumber() == number)
+		{
+			account.showAccount();
+			cout << "Enter the new details" << endl;
+			account.modify();
+			int pos = (-1)*static_cast<int>(sizeof(Account));
+			file.seekp(pos, ios::cur);
+			file.write(reinterpret_cast<char*>(&account), sizeof(Account));
+			cout << "Record updated" << endl;
+			found = true;
+		}
+	}
+
+	file.close();
+	if (found == false)
+		cout << "record not found" << endl;
+
+
+}
+
+void displayAll()
+{
+	Account account;
+
+	ifstream ifile;
+
+	ifile.open("account.dat", ios::binary);
+	if (!ifile)
+	{
+		cout << "file could not be read" << endl;
+		return;
+	}
+	else
+	{
+	
+
+	
+
+		cout << " \n\n\t\tACCOUNT HOLDER LIST \n\n";
+		cout << "==============================================" << endl;
+		cout << "ACCOUNT NUMBER          NAME         BALANCE\n";
+		cout << "==============================================" << endl;
+
+		
+
+		while (ifile.read(reinterpret_cast<char*>(&account), sizeof(Account)))
+		{
+
+		
+			account.report();
+			
+		}
+		
+	}
+	ifile.close();
+}
+
+void Deposit_Withdraw(int number, int transactionoption)
+{
+	int amt;
+
+	bool found = false;
+
+	Account account;
+
+	fstream file;
+
+	file.open("account.dat", ios::binary | ios::in, ios::out);
+	if (!file)
+	{
+		cout << "file could not be open" << endl;
+		return;
+	}
+
+	while (!file.eof() && found == false)
+	{
+		file.read(reinterpret_cast<char*>(&account), sizeof(Account));
+		if (account.returnAccountNumber() == number)
+		{
+			account.showAccount();
+			if (transactionoption == 1)
+			{
+				cout << "Enter the amount to be deposited" << endl;
+				cin >> amt;
+				account.Deposit(amt);
+			}
+
+
+			if (transactionoption== 2)
+			{
+				cout << "Enter amount to withdraw" << endl;
+				cin >> amt;
+				int balance = (account.returnBalance() - amt);
+				if (account.returnBalance() < amt)
+					cout << "Insufficient Balance" << endl;
+				else
+					account.Withdraw(amt);
+			}
+
+			int pos = (-1)*static_cast<int>(sizeof(Account));
+			file.seekp(pos, ios::cur);
+			file.write(reinterpret_cast<char*>(&account), sizeof(Account));
+			cout << "Record Updated" << endl;
+			found = true;
+		}
+	}
+
+	file.close();
+	if (found == false)
+		cout << "Record not Found" << endl;
+
+}

@@ -11,17 +11,94 @@ void modifyAccount(int);
 void displayAll();
 void Deposit_Withdraw(int,int);
 
+void menu()
+{
+
+	int num=0;
+	int option;
+
+	do
+	{
+		cout << "===MENU===" << endl;
+		cout << "1-Create Account" << endl;
+		cout << "2-Deposit" << endl;
+		cout << "3-Withdraw" << endl;
+		cout << "4-Balance Enquiry" << endl;
+		cout << "5-All Accounts" << endl;
+		cout << "6-Close Account" << endl;
+		cout << "7-Modify Account" << endl;
+		cout << "8-Exit" << endl;
+
+		cin >> option;
+
+		switch (option)
+		{
+		case 1:
+			writeAccount();
+			break;
+
+		case 2:
+			cout << "Enter the Account Number" << endl;
+			Deposit_Withdraw(num, 1);
+			break;
+
+		case 3:
+			cout << "Enter the Account Number" << endl;
+			Deposit_Withdraw(num, 2);
+			break;
+
+		case 4:
+			cout << "Enter Account Number" << endl;
+			cin >> num;
+			displayAccount(num);
+			break;
+
+		case 5:
+			displayAll();
+			break;
+
+		case 6:
+			cout << "Enter Account Number" << endl;
+			cin >> num;
+			deleteAccount(num);
+			break;
+
+		case 7:
+			cout << "Enter Account Number" << endl;
+			cin >> num;
+			modifyAccount(num);
+			break;
+
+		case 8:
+			cout << "Exiting Program" << endl;
+			break;
+
+		default:
+			cout << "Enter a valid option" << endl;
+			break;
+		}
+
+
+	} while (option != 8);
+
+	
+}
+
 
 int main()
 {
 
+	menu();
+
+
+	/*
 	
 	int num,option;
 	
 	do
 	{
 
-		system("cls");
+		
 
 		cout << "---Main Menu---" << endl;
 		cout << "1-Create Account" << endl;
@@ -84,7 +161,7 @@ int main()
 
 
 	} while (option!=8);
-
+	*/
 
 }
 
@@ -95,7 +172,9 @@ void writeAccount()
 	Account ac;
 	ofstream ofile;
 	ofile.open("account.dat", ios::binary | ios::app);
+	cout << "hello" << endl;
 	ac.createAccount();
+	cout << "hello" << endl;
 	ofile.write(reinterpret_cast<char*>(&ac), sizeof(Account));
 	ofile.close();
 
@@ -231,18 +310,17 @@ void displayAll()
 	
 
 		cout << " \n\n\t\tACCOUNT HOLDER LIST \n\n";
-		cout << "==============================================" << endl;
+		cout << "==============================================\n";
 		cout << "ACCOUNT NUMBER          NAME         BALANCE\n";
-		cout << "==============================================" << endl;
+		cout << "==============================================\n";
 
 		
 
 		while (ifile.read(reinterpret_cast<char*>(&account), sizeof(Account)))
 		{
-
-		
+			cin.get();
 			account.report();
-			
+			cin.get();
 		}
 		
 	}
@@ -251,7 +329,7 @@ void displayAll()
 
 void Deposit_Withdraw(int number, int transactionoption)
 {
-	int amt;
+	float amt;
 
 	bool found = false;
 
@@ -284,7 +362,7 @@ void Deposit_Withdraw(int number, int transactionoption)
 			{
 				cout << "Enter amount to withdraw" << endl;
 				cin >> amt;
-				int balance = (account.returnBalance() - amt);
+				float balance = (account.returnBalance() - amt);
 				if (account.returnBalance() < amt)
 					cout << "Insufficient Balance" << endl;
 				else

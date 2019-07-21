@@ -77,7 +77,7 @@ int Account::returnAccountNumber()
 
 }
 
-int Account::returnBalance() const
+float Account::returnBalance() const
 {
 	return balance;
 }

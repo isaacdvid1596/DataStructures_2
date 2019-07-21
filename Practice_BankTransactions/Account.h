@@ -27,7 +27,7 @@ public:
 	void Withdraw(float);
 	void report() const;
 	int returnAccountNumber();
-	int returnBalance() const;
+	float returnBalance() const;
 	
 };
 

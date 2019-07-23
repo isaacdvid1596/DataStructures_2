@@ -14,7 +14,7 @@ public:
 	int accountNumber;
 	char accountName[50];
 	float balance;
-	char transactionType = '/0';
+	char transactionType = '/0'; 
 	
 
 	Account();

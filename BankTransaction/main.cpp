@@ -10,7 +10,7 @@ void deleteAccount(int);
 void modifyAccount(int);
 void displayAll();
 void Deposit_Withdraw(int,int);
-void PrintTransactionHistory();
+void PrintTransactionHistory(int);
 
 
 struct transactionHistory
@@ -90,7 +90,7 @@ void menu()
 			cout << "Transactions History" << endl;
 			cout << "Enter the Account Number" << endl;
 			cin >> num;
-			PrintTransactionHistory();
+			PrintTransactionHistory(num);
 			break;
 
 
@@ -354,10 +354,17 @@ void Deposit_Withdraw(int number, int transactionoption)
 }
 
 
-void PrintTransactionHistory()
+void PrintTransactionHistory(int num)
 {
 	fstream fh;
 	transactionHistory transaction;
+	bool exists = false;
+
+	Account act;
+
+	transaction.account = act.accountNumber;
+	transaction.amount = act.balance;
+
 	fh.open("history.dat", ios::in);
 
 	if (!fh.is_open()) {
@@ -365,8 +372,34 @@ void PrintTransactionHistory()
 		cout << "File not found\n";
 
 	}
-	else {
+	else
+	{
 
+		if (act.returnAccountNumber() == num)
+		{
+			fh.read(reinterpret_cast<char*>(&transaction), sizeof(transactionHistory));
+			system("cls");
+			cout << "----Transaction History----\n";
+
+			while (fh.good())
+			{
+				cout << "Account #: " << transaction.account << endl;
+				cout << "Transaction Type: " << transaction.transactiontype << endl;
+				cout << "Amount: " << transaction.amount << endl;
+				cout << "--------------\n";
+				fh.read(reinterpret_cast<char*>(&transaction), sizeof(transactionHistory));
+			}
+
+
+				
+		}
+		else
+		{
+			cout << "account not found" << endl;
+		}
+
+			
+		/*
 		fh.read(reinterpret_cast<char*>(&transaction), sizeof(transactionHistory));
 		system("cls");
 		cout << "----Transaction History----\n";
@@ -378,9 +411,8 @@ void PrintTransactionHistory()
 			cout << "Amount: " << transaction.amount << endl;
 			cout << "--------------\n";
 			fh.read(reinterpret_cast<char*>(&transaction), sizeof(transactionHistory));
-
+			*/
 		}
 		fh.close();
 	}
 
-}

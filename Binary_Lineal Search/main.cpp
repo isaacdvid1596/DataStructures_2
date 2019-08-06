@@ -54,7 +54,7 @@ void sequentialsearch()
 	{
 		std::cout << "file not found \n";
 	}
-	
+
 	else
 	{
 
@@ -71,24 +71,25 @@ void sequentialsearch()
 		while (!fin.eof())
 		{
 			pos = fin.tellg();
-			
+
 			fin.read(reinterpret_cast<char*>(&element), sizeof(item));
 
-
+			break;
 		}
 
 		if (element.code == searchcode)
 		{
 			std::cout << "element found \n";
-
+			found = 't';
 		}
 		else
 			std::cout << "element not found \n";
+			found = 'f';
 
 
 	}
 
-	
+
 
 }
 
@@ -100,7 +101,7 @@ void binarysearch()
 
 int main()
 {
-	
+
 	//int option;
 
 
@@ -108,7 +109,7 @@ int main()
 
 	//std::cout << "---menu--- \n";
 	//std::cout<<""
-	
+
 
 
 	createRegister();

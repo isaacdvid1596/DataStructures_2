@@ -22,8 +22,9 @@ class FileRegister
 public:
 	void createRegister();
 	void SSearch(const char *);
-	int BSearch(const char *,int,int);
-	 FileRegister();
+	int BSearch(const char *, int, int);
+	Item checkPosition(int num);
+	void printRegister();
+	FileRegister();
 	~FileRegister();
 };
-

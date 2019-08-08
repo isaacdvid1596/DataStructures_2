@@ -1,30 +1,60 @@
 #include <iostream>
-#include <fstream>
-#include "CounterClock.h"
 #include "FileRegister.h"
+#include "CounterClock.h"
+
 
 using namespace std;
 
 int main()
 {
-	FileRegister fr;
-	char name[30];
-	
 
-	//fr.createRegister();
-	
-	//cin.get();
+	FileRegister fg;
+	CounterClock cc;
 
-	cout << "name you are searching for" << endl;
+	int option;
 
 
-	cin.getline(name, 30);
+	do 
+	{
+		cout << "MENU" << endl;
+		cout << "1-Create Register" << endl;
+		cout << "2-Linear Search" << endl;
+		cout << "3-Binary Search" << endl;
+		cout << "4-Exit" << endl;
+		cin >> option;
 
-	//cout << endl;
+		switch (option)
+		{
+		case 1:
+			fg.createRegister();
+			break;
+		case 2:
+			char name[30];
+			cout << "Linear Search" << endl;
+			cout << "Name :" << endl;
+			cin >> name;
+			cc.startCounter();
+			fg.SSearch(name);
+			cc.endCounter();
 
-	//cout << name;
+			cout << "Elapsed Time : " << cc.printTimeCounter() << endl;
+			break;
+
+		case 3:
+
+			char nameB[30];
+			cout << "Binary Search" << endl;
+			cout << "Name : " << endl;
+			cin >> nameB;
+			cc.startCounter();
+			int flag = fg.BSearch(nameB, 0, 20999);
+			cc.endCounter();
+			cout << "Elapsed time : " << cc.printTimeCounter() << endl;
+
+			break;
+		}
 
 
-	fr.SSearch(name);
+	} while (option != 4);
 
 }

@@ -7,18 +7,17 @@
 using namespace std;
 
 
-struct metadata
+struct metadata //virtualdisk metadata
 {
 	char filename[30]; 
-	unsigned int  filesize; 
-	char filecreationdate[8];
+	unsigned int  filesize;
 	char filecreator[30];
 	unsigned int filenumberentries;
 	unsigned int bitmapsize;
-	unsigned int directblockscount;
+	//unsigned int directblockscount;
 };
 
-struct inodeentry
+struct inodeentry 
 {
 	char name[25];
 	char creationdate[8];
@@ -26,9 +25,10 @@ struct inodeentry
 	int firstson=-1;
 	int rightbrother=-1;
 	char type;
-	int size;
+	unsigned int size;
 	bool occupied = false;
-	
+	unsigned int directdatablocks[12];
+	unsigned int indirectdatablocks[3];  //15 blocks inode
 };
 
 struct directdatablock
@@ -38,16 +38,16 @@ struct directdatablock
 
 struct indirectdatablocklvl1
 {
-	int pointers[16];
+	unsigned int pointers[16];
 };
 
 struct indirectdatablocklvl2
 {
-	int pointers[32];
+	unsigned int pointers[32];
 };
 
 struct indirectdatablocklvl3
 {
-	int pointers[64];
+	unsigned int pointers[64];
 };
 

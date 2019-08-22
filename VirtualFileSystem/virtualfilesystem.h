@@ -9,5 +9,6 @@ private:
 
 public:
 
-	void virtualfilesystem::createVirtualDisk(char name[20]);
+	void createVirtualDisk(char name[20]);
+
 };

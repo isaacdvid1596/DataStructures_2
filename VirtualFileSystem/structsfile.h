@@ -14,13 +14,13 @@ struct metadata //virtualdisk metadata
 	char filecreator[30];
 	unsigned int filenumberentries;
 	unsigned int bitmapsize;
-	//unsigned int directblockscount;
+	unsigned int directblockscount;
 };
 
 struct inodeentry 
 {
 	char name[25];
-	char creationdate[8];
+	char creationdate[10];
 	int parent=-1;
 	int firstson=-1;
 	int rightbrother=-1;

@@ -15,6 +15,9 @@ struct diskdate
 	int d_day = ltm->tm_mday;
 	int d_month = 1 + ltm->tm_mon;
 	int d_year = 1900 + ltm->tm_year;
+
+
+	
 };
 
 
@@ -48,6 +51,7 @@ struct inodeentry
 	int parent; // 4
 	int firstson;//4
 	int rightbrother;//4
+	int lastson;
 	char type; //1
 	int size; //4
 	bool occupied; //1

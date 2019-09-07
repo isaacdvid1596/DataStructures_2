@@ -128,6 +128,9 @@ void virtualfilesystem::mkdiraux(int parent, char name[25])
 	{
 		idiskfile.seekg(0, ios::beg); //set readpointer to very beginning 
 		int isempty = -1; // null isempty variable
+		
+		
+
 		bool isfirstchild = false; //bool that verifies if inode is fc
 		
 		//create instances of structs
@@ -158,11 +161,11 @@ void virtualfilesystem::mkdiraux(int parent, char name[25])
 			if (i == parent && (inode.type == 'D'))
 			{
 
-				//if it does not have first son
+				
 
 				if (inode.firstson == -1)
 				{
-					isfirstchild = true;
+					isfirstchild = true; // if first son info on inode is -1 then true
 				}
 
 				if (inode.firstson != -1)
@@ -178,6 +181,7 @@ void virtualfilesystem::mkdiraux(int parent, char name[25])
 				isempty = i; //assign index to isempty
 			}
 
+			
 
 
 		}
@@ -206,6 +210,7 @@ void virtualfilesystem::mkdir(int isempty, int parent, bool isfirstchild, char n
 	fstream diskfile("disk.bin", ios::out | ios::in | ios::binary);
 
 
+
 	int size = sizeof(metadata);
 
 	if (!diskfile)
@@ -218,6 +223,8 @@ void virtualfilesystem::mkdir(int isempty, int parent, bool isfirstchild, char n
 		inodeentry inode;
 
 		inode.occupied = true;
+
+		
 
 		int readpointer = size + (sizeof(inodeentry) * isempty);
 		diskfile.seekg(readpointer);  
@@ -241,17 +248,11 @@ void virtualfilesystem::mkdir(int isempty, int parent, bool isfirstchild, char n
 			cout << "parent is " << inode1.name << endl;
 			diskfile.seekp(-(sizeof(inodeentry) - diskfile.tellp()));
 			inode1.firstson = isempty;
-			diskfile.read(reinterpret_cast<char*>(&inode1), sizeof(inodeentry));
+			diskfile.write(reinterpret_cast<char*>(&inode1), sizeof(inodeentry));
 		}
 		else
 		{
-			inodeentry inode1;
-			diskfile.seekg(sizeof(metadata) + sizeof(inodeentry)*parent);
-			diskfile.read(reinterpret_cast<char*>(&inode1),sizeof(inodeentry));
-			cout << "Parent is : " << inode.name << endl;
-			diskfile.seekp(-(sizeof(inodeentry) - diskfile.tellp()));
-			diskfile.write(reinterpret_cast<char*>(&inode1), sizeof(inodeentry));
-
+			
 			//change of number to brother
 
 			inodeentry inode2;
@@ -259,11 +260,8 @@ void virtualfilesystem::mkdir(int isempty, int parent, bool isfirstchild, char n
 			diskfile.read(reinterpret_cast<char*>(&inode2), sizeof(inodeentry));
 			inode2.rightbrother = isempty;
 			diskfile.seekp(-(sizeof(inodeentry) - diskfile.tellp()));
+				
 			diskfile.write(reinterpret_cast<const char*>(&inode2), sizeof(inodeentry));
-			
-
-
-
 		}
 
 
@@ -272,8 +270,8 @@ void virtualfilesystem::mkdir(int isempty, int parent, bool isfirstchild, char n
 
 }
 
-/*
-void virtualfilesystem::cd()
+
+int virtualfilesystem::cd(char name[25],int parent) //cd function
 {
 	ifstream idiskfile("disk.bin", ios::in | ios::binary);
 
@@ -283,19 +281,66 @@ void virtualfilesystem::cd()
 	}
 	else
 	{
+		idiskfile.seekg(0, ios::beg); //set read pointer to beginning
+
+		metadata meta; //intance metadata
+
+		idiskfile.read(reinterpret_cast<char*>(&meta), sizeof(metadata));
+
+		int totaldentries = meta.totaldentries;
+
+		inodeentry inode;
+
+		int size = sizeof(metadata); //size equal to end of metadata , beg of inodeentry
+
+		idiskfile.seekg(size); //place read pointer in beg of inodeentry struct
+
+		idiskfile.read(reinterpret_cast<char*>(&inode), sizeof(inodeentry));
+
+		for (int i = 0; i < totaldentries; i++)
+		{
+			idiskfile.seekg(size + (sizeof(inodeentry)*i));
+
+			idiskfile.read(reinterpret_cast<char*>(&inode), sizeof(inodeentry));
+
+			if (strcmp(inode.name, name) == 0 && inode.parent == parent)
+			{
+				cout << "name : " << inode.name << endl;
+				return i;
+			}
+		}
+
+		if (strcmp(inode.name, name) !=0)
+		{
+			cout << "directory cannot be found" << endl;
+		}
+
 
 	}
-
-
-
-
-
-
-
 }
-*/
-void virtualfilesystem::cdback()
+
+
+//sin probar 
+int virtualfilesystem::cdback(int parentpos) //cd.. function  , receives parent position 
 {
+	inodeentry inode;
+
+	ifstream idiskfile("disk.bin", ios::in | ios::out | ios::binary);
+
+	int size = sizeof(metadata);
+	idiskfile.seekg(size + (sizeof(inodeentry) * parentpos));
+	idiskfile.read(reinterpret_cast<char*>(&inode), sizeof(inodeentry));
+
+
+	if (inode.parent!=-1)
+	{
+		return inode.parent;
+	}
+	else
+	{
+		cout << "currently in main directory" << endl;
+		return 0;
+	}
 
 }
 

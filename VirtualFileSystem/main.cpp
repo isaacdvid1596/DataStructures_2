@@ -35,7 +35,7 @@ int main()
 
 	int pos = 0;
 	bool ing = true;
-	bool create = true;
+	//bool create = true;
 	char name[20];
 	int dentries;
 	char path[30];
@@ -59,11 +59,11 @@ int main()
 		{
 			cout << x << endl;
 			cout << command << endl;
-			create == true;
+			//create == true;
 			cout << "disk name :" << endl;
 			cin >> name;
 			cout << "everything is chill" << endl;
-			cout << "number of directory entries : vfs" << endl;
+			cout << "number of directory entries : ";
 			cin >> dentries;
 			cout << "still chilling" << endl;
 			
@@ -78,6 +78,21 @@ int main()
 			vfs.mkdiraux(pos,name);
 
 			vfs.readvirtualdisk();
+		}
+
+		if (strcmp(command, "cd") == 0) 
+		{
+
+			cout << "cd:";
+			cin >> name;
+
+			if (strcmp(name, "..") == 0) {
+				pos = vfs.cdback(pos);
+			}
+			else {
+				pos = vfs.cd(name, pos);
+			}
+
 		}
 
 	} while (ing == true);

@@ -46,7 +46,14 @@ void virtualfilesystem::virtualDiskSim(char diskname[20],int dentries)
 
 		//bitmap
 
-
+		
+		bitmap bm;
+		bm.bitmap = initializebitmap(dentries * (33308)); //dentries * ndbs
+		bm.bitmaplvl1 = initializebitmap(dentries * (33308));
+		bm.bitmaplvl2 = initializebitmap(dentries * (33308));
+		bm.bitmaplvl3 = initializebitmap(dentries * (33308));
+		diskfile.write(reinterpret_cast<char*>(&bm), sizeof(bitmap));
+		
 
 		//inodeEntry
 
@@ -68,7 +75,6 @@ void virtualfilesystem::virtualDiskSim(char diskname[20],int dentries)
 		root.parent = -1;
 		root.size = 0;
 		root.occupied = true;
-		root.lastchild = -1; //rm ref
 
 		diskfile.write(reinterpret_cast<char*>(&root), sizeof(inodeentry));
 		
@@ -151,10 +157,10 @@ void virtualfilesystem::readvirtualdisk()
 	cout << endl;
 	cout << endl;
 
-	int metasize = sizeof(metadata);
+	int sizeofstructs = sizeof(metadata)+sizeof(bitmap);
 
 
-	idiskfile.seekg(metasize);
+	idiskfile.seekg(sizeofstructs);
 
 	idiskfile.read(reinterpret_cast<char*>(&inode), sizeof(inodeentry));
 	cout << mdata.totaldentries << endl;
@@ -170,7 +176,6 @@ void virtualfilesystem::readvirtualdisk()
 		cout << "inode type : " << inode.type << endl;
 		cout << "inode size : " << inode.size << endl;
 		cout << "inode occupied : " << inode.occupied << endl;
-		cout << "inode last child ref : " << inode.lastchild << endl;
 		cout << endl;
 		cout << endl;
 
@@ -211,7 +216,7 @@ void virtualfilesystem::mkdiraux(int parent, char name[25])
 
 		//read  metadata struct
 		idiskfile.read(reinterpret_cast<char*>(&meta), sizeof(metadata));
-		int size = sizeof(metadata);//size that contains sizeof whole metadata struct 
+		int size = sizeof(metadata)+sizeof(bitmap);//size that contains sizeof whole metadata struct 
 		idiskfile.seekg(size);//set readpointer to end of metadata , end of inode
 		idiskfile.read(reinterpret_cast<char*>(&inode),sizeof(inodeentry));
 		//read the inode struct from the very beginning 
@@ -282,7 +287,7 @@ void virtualfilesystem::mkdir(int isempty, int parent, bool isfirstchild, char n
 
 
 
-	int size = sizeof(metadata);
+	int size = sizeof(metadata)+sizeof(bitmap);
 
 	if (!diskfile)
 	{
@@ -320,7 +325,7 @@ void virtualfilesystem::mkdir(int isempty, int parent, bool isfirstchild, char n
 		{
 			inodeentry inode1; //parent 
 
-			diskfile.seekg(sizeof(metadata) + (sizeof(inodeentry) * parent));
+			diskfile.seekg(sizeof(metadata) + sizeof(bitmap)+(sizeof(inodeentry) * parent));
 			diskfile.read(reinterpret_cast<char*>(&inode1), sizeof(inodeentry));
 			cout << "parent is " << inode1.name << endl;
 			diskfile.seekp(-(sizeof(inodeentry) - diskfile.tellp()));
@@ -330,22 +335,11 @@ void virtualfilesystem::mkdir(int isempty, int parent, bool isfirstchild, char n
 		}
 		else
 		{
-			inodeentry inode1;
-			diskfile.seekg(sizeof(metadata) + sizeof(inodeentry)*parent);
-			diskfile.read(reinterpret_cast<char*>(&inode1), sizeof(inodeentry));
-			cout << "parent is : " << inode1.name << endl;
-			diskfile.seekp(-(sizeof(inodeentry) - diskfile.tellp()));
-			int x = inode1.lastchild;
-			inode1.lastchild = isempty;
-			cout << inode1.lastchild << endl;
-			diskfile.write(reinterpret_cast<const char*>(&inode1), sizeof(inodeentry));
-
-
-
+			
 			//change of number to brother
 
 			inodeentry inode2;
-			diskfile.seekg(sizeof(metadata) + sizeof(inodeentry)*x);
+			diskfile.seekg(sizeof(metadata) + sizeof(bitmap)+ sizeof(inodeentry));
 			diskfile.read(reinterpret_cast<char*>(&inode2), sizeof(inodeentry));
 			inode2.rightbrother = isempty;
 			diskfile.seekp(-(sizeof(inodeentry) - diskfile.tellp()));
@@ -380,7 +374,7 @@ int virtualfilesystem::cd(char name[25],int parent) //cd function
 
 		inodeentry inode;
 
-		int size = sizeof(metadata); //size equal to end of metadata , beg of inodeentry
+		int size = sizeof(metadata)+sizeof(bitmap); //size equal to end of metadata , beg of inodeentry
 
 		idiskfile.seekg(size); //place read pointer in beg of inodeentry struct
 
@@ -416,7 +410,7 @@ int virtualfilesystem::cdback(int parentpos) //cd.. function  , receives parent 
 
 	ifstream idiskfile("disk.bin", ios::in | ios::out | ios::binary);
 
-	int size = sizeof(metadata);
+	int size = sizeof(metadata)+sizeof(bitmap);
 	idiskfile.seekg(size + (sizeof(inodeentry) * parentpos));
 	idiskfile.read(reinterpret_cast<char*>(&inode), sizeof(inodeentry));
 
@@ -425,7 +419,7 @@ int virtualfilesystem::cdback(int parentpos) //cd.. function  , receives parent 
 	{
 
 		return inode.parent;
-	
+		cout << inode.parent << endl;
 		
 	}
 	else
@@ -439,7 +433,7 @@ int virtualfilesystem::cdback(int parentpos) //cd.. function  , receives parent 
 void virtualfilesystem::ls(int parent)
 {
 	bool flag = true;
-
+	//bool that returns wether inode pos sent parent atribute matches with position sent by us
 
 	ifstream idiskfile("disk.bin", ios::in | ios::binary);
 
@@ -450,10 +444,10 @@ void virtualfilesystem::ls(int parent)
 	idiskfile.read(reinterpret_cast<char*>(&meta), sizeof(metadata));
 
 
-	int totalofdentries = meta.totaldentries;
+	int totalofdentries = meta.totaldentries; 
 
 	inodeentry inode;
-	idiskfile.seekg(sizeof(metadata) + sizeof(inodeentry) * parent);
+	idiskfile.seekg(sizeof(metadata) +sizeof(bitmap)+ sizeof(inodeentry) * parent);
 	idiskfile.read(reinterpret_cast<char*>(&inode), sizeof(inodeentry));
 	
 	if (!idiskfile)
@@ -463,22 +457,23 @@ void virtualfilesystem::ls(int parent)
 	else
 	{
 		inodeentry inode1;
-		int size = sizeof(metadata);
-		idiskfile.seekg(size);
-		idiskfile.read(reinterpret_cast<char*>(&inode1), sizeof(inodeentry));	
+		int size = sizeof(metadata)+sizeof(bitmap);
+		idiskfile.seekg(size); // size of metadata
+		idiskfile.read(reinterpret_cast<char*>(&inode1), sizeof(inodeentry));	//read beg of inode struct
 
-		for (int i = 0; i < totalofdentries; i++)
+		for (int i = 0; i < totalofdentries; i++) //read all entries
 		{
 			idiskfile.seekg(size + (sizeof(inodeentry)*i));
 			idiskfile.read(reinterpret_cast<char*>(&inode1), sizeof(inodeentry));
 
-			if (inode1.parent == parent)
+			if (inode1.parent == parent) //if node's parent matches parameter sent in func
 			{
 				cout << "name : " << inode1.name << endl;
 				cout << "size : " <<inode1.size<< endl;
 				cout << "type : " << inode1.type << endl;
 				cout << "-------" << endl;
 				flag = false;
+
 			}
 
 			if (flag == true)
@@ -497,45 +492,7 @@ void virtualfilesystem::ls(int parent)
 
 void virtualfilesystem::rm(int pos)
 {
-	bool flag = true;
-	inodeentry actualinode, inode1;
-
-	fstream diskfile("disk.bin", ios::in | ios::out | ios::binary);
-
-	int size = sizeof(metadata);
-	diskfile.seekg(size + (sizeof(inodeentry) * pos));
-	diskfile.read(reinterpret_cast<char*>(&actualinode), sizeof(inodeentry));
-
-	if (actualinode.firstson == -1 && actualinode.rightbrother == -1)
-	{
-		diskfile.seekg(size + (sizeof(inodeentry) * pos));
-		diskfile.read(reinterpret_cast<char*>(&actualinode), sizeof(inodeentry));
-		diskfile.seekp(-(sizeof(inodeentry) - diskfile.tellp()));
-		diskfile.write(reinterpret_cast<char*>(&inode1), sizeof(inodeentry));
-	}
-	else if (actualinode.firstson != 1)
-	{
-		rmaux(actualinode.firstson);
-		diskfile.seekg(size + (sizeof(inodeentry) * pos));
-		diskfile.read(reinterpret_cast<char*>(&actualinode), sizeof(inodeentry));
-		diskfile.seekp(-(sizeof(inodeentry) - diskfile.tellp()));
-		diskfile.write(reinterpret_cast<char*>(&inode1), sizeof(inodeentry));
-		flag = false;
-	}
-	else if (actualinode.rightbrother != -1)
-	{
-		rm(actualinode.rightbrother);
-		diskfile.seekg(size + (sizeof(inodeentry) * pos));
-		diskfile.read(reinterpret_cast<char*>(&actualinode), sizeof(inodeentry));
-		diskfile.seekp(-(sizeof(inodeentry) - diskfile.tellp()));
-		diskfile.write(reinterpret_cast<char*>(&inode1), sizeof(inodeentry));
-		flag = false;
-
-	}
 	
-
-
-	/*
 	fstream diskfile("disk.bin", ios::in | ios::out | ios::binary);
 
 	if (!diskfile)
@@ -554,13 +511,13 @@ void virtualfilesystem::rm(int pos)
 		diskfile.read(reinterpret_cast<char*>(&meta), sizeof(metadata));//read metada to get dentries
 
 		inodeentry inode;
-		int size=sizeof(metadata);
+		int size=sizeof(metadata)+sizeof(bitmap);
 		diskfile.seekg(size); //set read pointer to beg of inode struct
 		diskfile.read(reinterpret_cast<char*>(&inode), sizeof(inodeentry));
 
 		int totaldentries = meta.totaldentries;
 		inodeentry in;
-		diskfile.seekg(size + (sizeof(inodeentry) * parent));
+		diskfile.seekg(size + (sizeof(inodeentry) * pos));
 		diskfile.read(reinterpret_cast<char*>(&inode), sizeof(inodeentry));
 		diskfile.seekp(-(sizeof(inodeentry) - diskfile.tellp())); //rewrite structure by giving it negtive offset 
 		diskfile.write(reinterpret_cast<char*>(&in), sizeof(inodeentry));
@@ -568,37 +525,9 @@ void virtualfilesystem::rm(int pos)
 
 		diskfile.close();
 	}
-	*/
-}
-
-
-void virtualfilesystem::rmaux(int pos)
-{
-	inodeentry actualinode, p;
 	
-	fstream diskfile("disk.bin", ios::in | ios::out | ios::binary);
-
-	int size = sizeof(metadata);
-	diskfile.seekg(size + (sizeof(inodeentry) * pos));
-	diskfile.read(reinterpret_cast<char*>(&actualinode), sizeof(inodeentry));
-
-	if (actualinode.firstson != -1)
-	{
-		rm(actualinode.firstson);
-		diskfile.seekg(size + (sizeof(inodeentry) * pos));
-		diskfile.read(reinterpret_cast<char*>(&actualinode), sizeof(inodeentry));
-		diskfile.seekp(-(sizeof(inodeentry) - diskfile.tellp()));
-		diskfile.write(reinterpret_cast<char*>(&p), sizeof(inodeentry));
-	}
-	else
-	{
-		diskfile.seekg(size + (sizeof(inodeentry) * pos));
-		diskfile.read(reinterpret_cast<char*>(&actualinode), sizeof(inodeentry));
-		diskfile.seekp(-(sizeof(inodeentry) - diskfile.tellp()));
-		diskfile.write(reinterpret_cast<char*>(&p), sizeof(inodeentry));
-	}
-
 }
+
 
 
 

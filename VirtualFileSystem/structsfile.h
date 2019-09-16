@@ -49,7 +49,6 @@ struct inodeentry
 	bool occupied; //1
 	unsigned int directblocks[12];
 	unsigned int indirectblocks[3];
-	int lastchild = -1; //4 for rm
 	
 	inodeentry()
 	{
@@ -60,7 +59,6 @@ struct inodeentry
 		type = '\0';
 		size = 4096;
 		occupied = false;
-		lastchild = -1;
 		for (int i = 0; i < 11; i++)
 		{
 			directblocks[i] = 0;
@@ -98,4 +96,7 @@ struct indirectdatablocklvl3
 struct bitmap
 {
 	char* bitmap;
+	char* bitmaplvl1;
+	char* bitmaplvl2;
+	char* bitmaplvl3;
 };

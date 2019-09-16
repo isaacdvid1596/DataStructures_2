@@ -104,16 +104,19 @@ int main()
 
 		if (strcmp(command, "rm") == 0)
 		{
-			/*
+			
 			int pos1 = pos;
 			pos = vfs.cdback(pos);
 			vfs.rm(pos1);
+			cout << pos1 << endl;
 			vfs.readvirtualdisk();
-			*/
+			
+			/*
 			int pos1 = pos;
 			pos = vfs.cdback(pos);
 			vfs.rmaux(pos1);
 			vfs.readvirtualdisk();
+			*/
 		}
 
 

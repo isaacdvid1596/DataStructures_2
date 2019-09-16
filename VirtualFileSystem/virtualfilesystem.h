@@ -17,7 +17,7 @@ public:
 	int cd(char name[25],int parent);
 	int cdback(int);
 	void ls(int parent);
-	void rm(int parent);
+	void rm(int pos);
 	//void import();
 	//void export();
 	
@@ -25,7 +25,7 @@ public:
 	void readvirtualdisk();
 	void mkdiraux(int parent , char name [30]);
 	bool isfile(int parent);
-	void rmaux(int pos);
+	//void rmaux(int pos);
 
 	char* initializebitmap(int n);
 	void printbitmap(char* bitmap, int ndblocks);

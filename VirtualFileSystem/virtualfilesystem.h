@@ -16,10 +16,20 @@ public:
 	void mkdir(int,int, bool,char name[25]);
 	int cd(char name[25],int parent);
 	int cdback(int);
-
+	void ls(int parent);
+	void rm(int parent);
+	//void import();
+	//void export();
 	
 	//auxfunctions
 	void readvirtualdisk();
 	void mkdiraux(int parent , char name [30]);
+	bool isfile(int parent);
+	void rmaux(int pos);
+
+	char* initializebitmap(int n);
+	void printbitmap(char* bitmap, int ndblocks);
+	char* bitmapon(char* bitmap, int ndblocks);
+	char* bitmapoff(char* bitmap, int ndblocks);
 	
 };

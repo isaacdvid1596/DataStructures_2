@@ -5,19 +5,11 @@
 
 struct diskdate
 {
+	//initialize date struct
 
-	time_t now = time(0);
-
-	tm* ltm = localtime(&now);
-
-
-
-	int d_day = ltm->tm_mday;
-	int d_month = 1 + ltm->tm_mon;
-	int d_year = 1900 + ltm->tm_year;
-
-
-	
+	int d_day = -1;
+	int d_month = -1;
+	int d_year = -1;
 };
 
 
@@ -47,16 +39,17 @@ struct metadata
 struct inodeentry
 {
 	char name[25];//25bytes
+
 	diskdate id; //8bytes
 	int parent; // 4
 	int firstson;//4
 	int rightbrother;//4
-	int lastson;
 	char type; //1
 	int size; //4
 	bool occupied; //1
 	unsigned int directblocks[12];
 	unsigned int indirectblocks[3];
+	int lastchild = -1; //4 for rm
 	
 	inodeentry()
 	{
@@ -67,6 +60,7 @@ struct inodeentry
 		type = '\0';
 		size = 4096;
 		occupied = false;
+		lastchild = -1;
 		for (int i = 0; i < 11; i++)
 		{
 			directblocks[i] = 0;
@@ -99,4 +93,9 @@ struct indirectdatablocklvl2
 struct indirectdatablocklvl3
 {
 	unsigned int pointers[64];
+};
+
+struct bitmap
+{
+	char* bitmap;
 };

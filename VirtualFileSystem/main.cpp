@@ -33,8 +33,8 @@ int main()
 	cout << "exiting program" << endl;
 	*/
 
-	int pos = 0;
-	bool ing = true;
+	int pos = 0; //position we send as parameter
+	bool flag = true;
 	//bool create = true;
 	char name[20];
 	int dentries;
@@ -85,17 +85,43 @@ int main()
 
 			cout << "cd:";
 			cin >> name;
-
-			if (strcmp(name, "..") == 0) {
-				pos = vfs.cdback(pos);
-			}
-			else {
-				pos = vfs.cd(name, pos);
-			}
+			pos = vfs.cd(name, pos);
+			
 
 		}
 
-	} while (ing == true);
+		if (strcmp(command, "cd..") == 0)
+		{
+			cout << "cd.. : ";
+			pos = vfs.cdback(pos);
+		}
+
+
+		if(strcmp(command, "ls")==0)
+		{
+			vfs.ls(pos);
+		}
+
+		if (strcmp(command, "rm") == 0)
+		{
+			/*
+			int pos1 = pos;
+			pos = vfs.cdback(pos);
+			vfs.rm(pos1);
+			vfs.readvirtualdisk();
+			*/
+			int pos1 = pos;
+			pos = vfs.cdback(pos);
+			vfs.rmaux(pos1);
+			vfs.readvirtualdisk();
+		}
+
+
+		//import
+		//export
+
+
+	} while (flag == true);
 
 
 
